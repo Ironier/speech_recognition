@@ -3,8 +3,9 @@
 import time
 
 import numpy as np
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 from tensorflow.python.ops import ctc_ops
+tf.disable_eager_execution()
 
 import utils
 from config import Config
@@ -97,12 +98,12 @@ class BiRNN(object):
         # 双向rnn
         with tf.name_scope('birnn'):
             # 前向
-            lstm_fw_cell = tf.contrib.rnn.BasicLSTMCell(n_cell_dim, forget_bias=1.0, state_is_tuple=True)
-            lstm_fw_cell = tf.contrib.rnn.DropoutWrapper(lstm_fw_cell,
+            lstm_fw_cell = tf.nn.rnn_cell.BasicLSTMCell(n_cell_dim, forget_bias=1.0, state_is_tuple=True)
+            lstm_fw_cell = tf.nn.rnn_cell.DropoutWrapper(lstm_fw_cell,
                                                          input_keep_prob=keep_dropout)
             # 后向
-            lstm_bw_cell = tf.contrib.rnn.BasicLSTMCell(n_cell_dim, forget_bias=1.0, state_is_tuple=True)
-            lstm_bw_cell = tf.contrib.rnn.DropoutWrapper(lstm_bw_cell,
+            lstm_bw_cell = tf.nn.rnn_cell.BasicLSTMCell(n_cell_dim, forget_bias=1.0, state_is_tuple=True)
+            lstm_bw_cell = tf.nn.rnn_cell.DropoutWrapper(lstm_bw_cell,
                                                          input_keep_prob=keep_dropout)
 
             # `layer_3`  `[n_steps, batch_size, 2*n_cell_dim]`
@@ -274,7 +275,7 @@ class BiRNN(object):
     def test(self):
         index = 0
         next_idx = 20
-        
+
         for index in range(10):
            next_idx, self.audio_features, self.audio_features_len, self.sparse_labels, wav_files = utils.next_batch(
                next_idx,
@@ -291,7 +292,7 @@ class BiRNN(object):
            d, train_ler = self.sess.run([self.decoded[0], self.label_err], feed_dict=self.get_feed_dict(dropout=1.0))
            dense_decoded = tf.sparse_tensor_to_dense(d, default_value=-1).eval(session=self.sess)
            dense_labels = utils.trans_tuple_to_texts_ch(self.sparse_labels, self.words)
-        
+
            for orig, decoded_array in zip(dense_labels, dense_decoded):
                # 转成string
                decoded_str = utils.trans_array_to_text_ch(decoded_array, self.words)
@@ -323,7 +324,7 @@ class BiRNN(object):
 
     def build_train(self):
         self.add_placeholders()
-        self.bi_rnn_layer()
+        self.bi_rnn_layer() 
         self.loss()
         self.init_session()
         self.add_summary()

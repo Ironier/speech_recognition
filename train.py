@@ -10,7 +10,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 conf = Config()
 
-wav_files, text_labels = utils.get_wavs_lables()
+wav_files, text_labels = utils.get_wavs_labels()
 
 words_size, words, word_num_map = utils.create_dict(text_labels)
 

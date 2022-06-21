@@ -10,9 +10,9 @@ from python_speech_features import mfcc
 from config import Config
 
 
-def get_wavs_lables():
+def get_wavs_labels():
     conf = Config()
-    wav_files, text_labels = do_get_wavs_lables(conf.get("FILE_DATA").wav_path,
+    wav_files, text_labels = do_get_wavs_labels(conf.get("FILE_DATA").wav_path,
                                                 conf.get("FILE_DATA").label_file)
     print(wav_files[0], text_labels[0])
     # wav/train/A11/A11_0.WAV -> 绿 是 阳春 烟 景 大块 文章 的 底色 四月 的 林 峦 更是 绿 得 鲜活 秀媚 诗意 盎然
@@ -21,7 +21,7 @@ def get_wavs_lables():
     return wav_files, text_labels
 
 
-def do_get_wavs_lables(wav_path, label_file):
+def do_get_wavs_labels(wav_path, label_file):
     """
     读取wav文件对应的label
     :param wav_path:
@@ -52,7 +52,7 @@ def do_get_wavs_lables(wav_path, label_file):
         # print(os.path.basename(wav_file))
         wav_id = os.path.basename(wav_file).split('.')[0]
 
-        if wav_id in labels_dict:
+        if wav_id in labels_dict.keys():
             labels.append(labels_dict[wav_id])
             new_wav_files.append(wav_file)
 
@@ -363,5 +363,5 @@ def pad_sequences(sequences, maxlen=None, dtype=np.float32,
 if __name__ == "__main__":
     conf = Config()
 
-    get_wavs_lables(conf.get("FILE_DATA").wav_path, conf.get("FILE_DATA").label_file)
+    do_get_wavs_labels(conf.get("FILE_DATA").wav_path, conf.get("FILE_DATA").label_file)
     print()
