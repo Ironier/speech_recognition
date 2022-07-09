@@ -207,7 +207,7 @@ class BiRNN(object):
         self.writer = tf.summary.FileWriter(self.conf.get("FILE_DATA").tensorboardfile, self.sess.graph)
 
     def train(self):
-        epochs = 120
+        epochs = 200
 
         # 准备运行训练步骤
         section = '\n{0:=^40}\n'
@@ -258,7 +258,7 @@ class BiRNN(object):
                     for orig, decoded_array in zip(dense_labels, dense_decoded):
                         # convert to strings
                         decoded_str = utils.trans_array_to_text_ch(decoded_array, self.words)
-                        print('语音原始文本: {}'.format(orig))
+                        print('语音原始文本  : {}'.format(orig))
                         print('识别出来的文本:  {}'.format(decoded_str))
                         break
 
@@ -296,15 +296,15 @@ class BiRNN(object):
            for orig, decoded_array in zip(dense_labels, dense_decoded):
                # 转成string
                decoded_str = utils.trans_array_to_text_ch(decoded_array, self.words)
-               print('语音原始文本: {}'.format(orig))
-               print('识别出来的文本:  {}'.format(decoded_str))
+               print('语音原始文本  : {}'.format(orig))
+               print('识别出来的文本: {}'.format(decoded_str))
                break
 
         self.sess.close()
 
-    def test_target_wav_file(self, wav_files, txt_labels):
-        print('读入语音文件: ', wav_files[0])
-        print('开始识别语音数据......')
+    def test_target_wav_file(self, wav_files, txt_labels=None):
+        #print('读入语音文件: ', wav_files[0])
+        print('[SR]开始识别语音数据......')
 
         self.audio_features, self.audio_features_len, text_vector, text_vector_len = utils.get_audio_mfcc_features(
             None,
@@ -317,10 +317,11 @@ class BiRNN(object):
         d, train_ler = self.sess.run([self.decoded[0], self.label_err], feed_dict=self.get_feed_dict(dropout=1.0))
         dense_decoded = tf.sparse_tensor_to_dense(d, default_value=-1).eval(session=self.sess)
         decoded_str = utils.trans_array_to_text_ch(dense_decoded[0], self.words)
-        print('语音原始文本: {}'.format(txt_labels[0]))
-        print('识别出来的文本:  {}'.format(decoded_str))
+        if(txt_labels[0]!='None'):
+            print('[SR]语音原始文本: {}'.format(txt_labels[0]))
+        print('[SR]识别出来的文本:  {}'.format(decoded_str))
 
-        self.sess.close()
+        #self.sess.close()
 
     def build_train(self):
         self.add_placeholders()
@@ -336,6 +337,12 @@ class BiRNN(object):
         self.loss()
         self.init_session()
         self.test()
+
+    def load_params(self):
+        self.add_placeholders()
+        self.bi_rnn_layer()
+        self.loss()
+        self.init_session()
 
     def build_target_wav_file_test(self, wav_files, txt_labels):
         self.add_placeholders()
